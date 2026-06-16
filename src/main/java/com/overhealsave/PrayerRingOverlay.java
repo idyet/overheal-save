@@ -18,8 +18,8 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 class PrayerRingOverlay extends Overlay
 {
 	private static final float RING_STROKE = 2f;
+	private static final int RING_PADDING = 4;
 	private static final long PULSE_HALF_PERIOD_MS = 400L;
-	private static final int PRAYER_COUNT = 30;
 
 	private final Client client;
 	private final OverhealSavePlugin plugin;
@@ -58,23 +58,67 @@ class PrayerRingOverlay extends Overlay
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setStroke(new BasicStroke(RING_STROKE));
 		g.setColor(pulseColor());
-		g.drawOval(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
+		g.drawOval(
+			bounds.x - RING_PADDING,
+			bounds.y - RING_PADDING,
+			bounds.width + RING_PADDING * 2 - 1,
+			bounds.height + RING_PADDING * 2 - 1);
 		return null;
 	}
 
 	private Widget findRapidHealWidget()
 	{
-		for (int i = 0; i < PRAYER_COUNT; i++)
+		Widget root = client.getWidget(InterfaceID.Prayerbook.UNIVERSE);
+		if (root == null || root.isHidden())
 		{
-			Widget w = client.getWidget(InterfaceID.Prayerbook.PRAYER1 + i);
-			if (w == null)
+			return null;
+		}
+		return walkForSprite(root);
+	}
+
+	private Widget walkForSprite(Widget w)
+	{
+		if (w == null)
+		{
+			return null;
+		}
+		int sprite = w.getSpriteId();
+		if (sprite == SpriteID.Prayeron.RAPID_HEAL || sprite == SpriteID.Prayeroff.RAPID_HEAL_DISABLED)
+		{
+			return w;
+		}
+		Widget result;
+		Widget[] dyn = w.getDynamicChildren();
+		if (dyn != null)
+		{
+			for (Widget c : dyn)
 			{
-				continue;
+				if ((result = walkForSprite(c)) != null)
+				{
+					return result;
+				}
 			}
-			int sprite = w.getSpriteId();
-			if (sprite == SpriteID.Prayeron.RAPID_HEAL || sprite == SpriteID.Prayeroff.RAPID_HEAL_DISABLED)
+		}
+		Widget[] stat = w.getStaticChildren();
+		if (stat != null)
+		{
+			for (Widget c : stat)
 			{
-				return w;
+				if ((result = walkForSprite(c)) != null)
+				{
+					return result;
+				}
+			}
+		}
+		Widget[] nest = w.getNestedChildren();
+		if (nest != null)
+		{
+			for (Widget c : nest)
+			{
+				if ((result = walkForSprite(c)) != null)
+				{
+					return result;
+				}
 			}
 		}
 		return null;
