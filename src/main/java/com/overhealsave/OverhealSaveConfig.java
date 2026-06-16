@@ -16,7 +16,7 @@ public interface OverhealSaveConfig extends Config
 	)
 	default boolean enableSound()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(
@@ -50,6 +50,6 @@ public interface OverhealSaveConfig extends Config
 	)
 	default int leadTicks()
 	{
-		return 5;
+		return 25;
 	}
 }
