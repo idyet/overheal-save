@@ -1,11 +1,12 @@
 package com.overhealsave;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
+import java.awt.geom.Arc2D;
 import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
@@ -17,9 +18,8 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 class PrayerRingOverlay extends Overlay
 {
-	private static final float RING_STROKE = 2f;
 	private static final int RING_PADDING = 4;
-	private static final long PULSE_HALF_PERIOD_MS = 400L;
+	private static final Stroke ARC_STROKE = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 
 	private final Client client;
 	private final OverhealSavePlugin plugin;
@@ -38,7 +38,7 @@ class PrayerRingOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D g)
 	{
-		if (!config.enablePrayerRing() || !plugin.isWarningActive())
+		if (!config.enablePrayerRing() || !plugin.isOverhealed())
 		{
 			return null;
 		}
@@ -55,14 +55,16 @@ class PrayerRingOverlay extends Overlay
 			return null;
 		}
 
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setStroke(new BasicStroke(RING_STROKE));
-		g.setColor(pulseColor());
-		g.drawOval(
-			bounds.x - RING_PADDING,
-			bounds.y - RING_PADDING,
-			bounds.width + RING_PADDING * 2 - 1,
-			bounds.height + RING_PADDING * 2 - 1);
+		double diameter = Math.max(bounds.width, bounds.height) + RING_PADDING * 2.0;
+		double cx = bounds.x + bounds.width / 2.0;
+		double cy = bounds.y + bounds.height / 2.0;
+		Arc2D.Double arc = new Arc2D.Double(cx - diameter / 2.0, cy - diameter / 2.0, diameter, diameter,
+			90.0, -360.0 * plugin.getDecayProgress(), Arc2D.OPEN);
+
+		g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g.setStroke(ARC_STROKE);
+		g.setColor(OverhealSaveColors.arcColor(plugin.isWarningActive()));
+		g.draw(arc);
 		return null;
 	}
 
@@ -122,11 +124,5 @@ class PrayerRingOverlay extends Overlay
 			}
 		}
 		return null;
-	}
-
-	private static Color pulseColor()
-	{
-		long phase = (System.currentTimeMillis() / PULSE_HALF_PERIOD_MS) & 1L;
-		return phase == 0 ? Color.RED : Color.ORANGE;
 	}
 }
