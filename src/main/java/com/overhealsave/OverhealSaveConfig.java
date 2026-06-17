@@ -20,12 +20,12 @@ public interface OverhealSaveConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "enableOrbGlow",
+		keyName = "enableOrbRing",
 		name = "Flash HP orb",
 		description = "Show a pulsing ring outside the hitpoints orb during the warning window.",
 		position = 1
 	)
-	default boolean enableOrbGlow()
+	default boolean enableOrbRing()
 	{
 		return true;
 	}

@@ -38,7 +38,7 @@ class HpOrbOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D g)
 	{
-		if (!config.enableOrbGlow() || !plugin.isOverhealed())
+		if (!config.enableOrbRing() || !plugin.isOverhealed())
 		{
 			return null;
 		}
