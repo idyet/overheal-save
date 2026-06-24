@@ -33,6 +33,10 @@ class HpOrbOverlay extends Overlay
 		this.config = config;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_WIDGETS);
+		// Render on top of the Regeneration Meter plugin, which also draws an
+		// arc on the HP orb. Both default to PRIORITY_DEFAULT; for DYNAMIC
+		// overlays a higher priority draws later (on top).
+		setPriority(Overlay.PRIORITY_HIGH);
 	}
 
 	@Override
