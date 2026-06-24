@@ -22,7 +22,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @PluginDescriptor(
 	name = "Overheal Save",
 	description = "Warns when overheal HP is about to decay so you can flick rapid heal to reset the timer.",
-	tags = {"combat", "hp", "health", "hitpoints", "prayer", "regen", "overheal", "decay", "rapid", "heal"}
+	tags = {"combat", "hp", "health", "hitpoints", "prayer", "regen", "overheal", "save", "decay", "rapid", "heal", "pvm", "pvp", "orb"}
 )
 public class OverhealSavePlugin extends Plugin
 {
