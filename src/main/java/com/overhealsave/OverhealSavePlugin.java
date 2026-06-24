@@ -57,6 +57,9 @@ public class OverhealSavePlugin extends Plugin
 	private boolean overhealed;
 
 	@Getter
+	private boolean atFullHp;
+
+	@Getter
 	private double decayProgress;
 
 	@Provides
@@ -72,6 +75,7 @@ public class OverhealSavePlugin extends Plugin
 		prevWarningActive = false;
 		warningActive = false;
 		overhealed = false;
+		atFullHp = false;
 		decayProgress = 0;
 		overlayManager.add(hpOrbOverlay);
 		overlayManager.add(prayerRingOverlay);
@@ -85,6 +89,7 @@ public class OverhealSavePlugin extends Plugin
 		warningActive = false;
 		prevWarningActive = false;
 		overhealed = false;
+		atFullHp = false;
 		decayProgress = 0;
 	}
 
@@ -97,6 +102,7 @@ public class OverhealSavePlugin extends Plugin
 			prevWarningActive = false;
 			warningActive = false;
 			overhealed = false;
+			atFullHp = false;
 			decayProgress = 0;
 		}
 	}
@@ -120,12 +126,13 @@ public class OverhealSavePlugin extends Plugin
 		final int currentHp = client.getBoostedSkillLevel(Skill.HITPOINTS);
 		final int maxHp = client.getRealSkillLevel(Skill.HITPOINTS);
 		overhealed = currentHp > maxHp;
+		atFullHp = currentHp == maxHp;
 
 		final int effectiveLead = Math.min(config.leadTicks(), cycleLen);
 		final boolean inLeadWindow = ticksSinceHpRegen >= cycleLen - effectiveLead;
 
 		warningActive = overhealed && inLeadWindow;
-		decayProgress = overhealed && ticksSinceHpRegen >= 0
+		decayProgress = (overhealed || atFullHp) && ticksSinceHpRegen >= 0
 			? 1.0 - (double) ticksSinceHpRegen / cycleLen
 			: 0;
 

@@ -43,6 +43,11 @@ class PrayerRingOverlay extends Overlay
 			return null;
 		}
 
+		if (config.prayerRingOnlyInLeadWindow() && !plugin.isWarningActive())
+		{
+			return null;
+		}
+
 		Widget rapidHeal = findRapidHealWidget();
 		if (rapidHeal == null || rapidHeal.isHidden())
 		{

@@ -31,14 +31,36 @@ public interface OverhealSaveConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "showRingAtFullHp",
+		name = "Show ring at full HP",
+		description = "Also show the hitpoints orb ring when at full HP, not only when overhealed.",
+		position = 2
+	)
+	default boolean showRingAtFullHp()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "enablePrayerRing",
 		name = "Highlight Rapid Heal",
 		description = "Show a pulsing ring around the Rapid Heal prayer icon during the warning window.",
-		position = 2
+		position = 3
 	)
 	default boolean enablePrayerRing()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		keyName = "prayerRingOnlyInLeadWindow",
+		name = "Rapid Heal ring only in lead window",
+		description = "Only show the Rapid Heal prayer ring during the warning lead window, not for the whole overheal cycle.",
+		position = 4
+	)
+	default boolean prayerRingOnlyInLeadWindow()
+	{
+		return false;
 	}
 
 	@Range(min = 1, max = 100)
@@ -46,7 +68,7 @@ public interface OverhealSaveConfig extends Config
 		keyName = "leadTicks",
 		name = "Warning lead (ticks)",
 		description = "Game ticks before the decay tick to start warning. 1 tick = 0.6s.",
-		position = 3
+		position = 5
 	)
 	default int leadTicks()
 	{
