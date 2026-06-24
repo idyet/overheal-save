@@ -129,7 +129,7 @@ public class OverhealSavePlugin extends Plugin
 			? 1.0 - (double) ticksSinceHpRegen / cycleLen
 			: 0;
 
-		if (warningActive && !prevWarningActive && config.enableSound())
+		if (warningActive && !prevWarningActive && config.enableSound() && rapidHealActive)
 		{
 			final double seconds = (cycleLen - ticksSinceHpRegen) * 0.6;
 			notifier.notify(String.format("Overheal decay in ~%.1fs — flick rapid heal!", seconds));
