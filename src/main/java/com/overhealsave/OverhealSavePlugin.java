@@ -150,12 +150,22 @@ public class OverhealSavePlugin extends Plugin
 			? 1.0 - (double) ticksSinceHpRegen / cycleLen
 			: 0;
 
-		if (warningActive && !prevWarningActive && config.enableSound() && rapidHealActive)
+		if (warningActive && !prevWarningActive && config.enableSound() && rapidHealUsable())
 		{
 			final double seconds = (cycleLen - ticksSinceHpRegen) * 0.6;
 			notifier.notify(String.format("Overheal decay in ~%.1fs — flick rapid heal!", seconds));
 		}
 
 		prevWarningActive = warningActive;
+	}
+
+	// During an active LMS match the Rapid Heal prayer is disabled and cannot be
+	// toggled, so the overheal-save flick is impossible and warning the player is
+	// pointless. BR_INGAME (LMS's internal "BringItOn" name) is 1 only inside a
+	// match (0 in the lobby / on normal worlds), so this doesn't over-suppress
+	// merely for being on an LMS world.
+	private boolean rapidHealUsable()
+	{
+		return client.getVarbitValue(VarbitID.BR_INGAME) == 0;
 	}
 }
