@@ -42,8 +42,31 @@ class HpOrbOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D g)
 	{
-		final boolean showAtFullHp = plugin.isAtFullHp() && config.showRingAtFullHp();
-		if (!config.enableOrbRing() || !(plugin.isOverhealed() || showAtFullHp))
+		if (!config.enableOrbRing())
+		{
+			return null;
+		}
+
+		final boolean visible;
+		final double sweepProgress;
+		final boolean flashing;
+		if (!plugin.isTimerKnown())
+		{
+			// Indeterminate: regen phase unknown. Show a full pulsing ring only when
+			// overhealed (never at full HP — no inaccurate countdown), prompting a flick.
+			visible = plugin.isOverhealed();
+			sweepProgress = 1.0;
+			flashing = true;
+		}
+		else
+		{
+			final boolean showAtFullHp = plugin.isAtFullHp() && config.showRingAtFullHp();
+			visible = plugin.isOverhealed() || showAtFullHp;
+			sweepProgress = plugin.getDecayProgress();
+			flashing = plugin.isWarningActive();
+		}
+
+		if (!visible)
 		{
 			return null;
 		}
@@ -63,11 +86,11 @@ class HpOrbOverlay extends Overlay
 		double y = bounds.y + (bounds.height / 2.0 - ORB_DIAMETER / 2.0);
 
 		Arc2D.Double arc = new Arc2D.Double(x, y, ORB_DIAMETER, ORB_DIAMETER,
-			90.0, -360.0 * plugin.getDecayProgress(), Arc2D.OPEN);
+			90.0, -360.0 * sweepProgress, Arc2D.OPEN);
 
 		g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g.setStroke(ARC_STROKE);
-		g.setColor(OverhealSaveColors.arcColor(plugin.isWarningActive()));
+		g.setColor(OverhealSaveColors.arcColor(flashing));
 		g.draw(arc);
 		return null;
 	}

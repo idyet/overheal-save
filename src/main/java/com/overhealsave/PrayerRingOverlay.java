@@ -43,9 +43,23 @@ class PrayerRingOverlay extends Overlay
 			return null;
 		}
 
-		if (config.prayerRingOnlyInLeadWindow() && !plugin.isWarningActive())
+		final double sweepProgress;
+		final boolean flashing;
+		if (!plugin.isTimerKnown())
 		{
-			return null;
+			// Indeterminate: full pulsing ring as a call-to-action to flick.
+			// The lead-window gate doesn't apply — there's no accurate window.
+			sweepProgress = 1.0;
+			flashing = true;
+		}
+		else
+		{
+			if (config.prayerRingOnlyInLeadWindow() && !plugin.isWarningActive())
+			{
+				return null;
+			}
+			sweepProgress = plugin.getDecayProgress();
+			flashing = plugin.isWarningActive();
 		}
 
 		Widget rapidHeal = findRapidHealWidget();
@@ -64,11 +78,11 @@ class PrayerRingOverlay extends Overlay
 		double cx = bounds.x + bounds.width / 2.0;
 		double cy = bounds.y + bounds.height / 2.0;
 		Arc2D.Double arc = new Arc2D.Double(cx - diameter / 2.0, cy - diameter / 2.0, diameter, diameter,
-			90.0, -360.0 * plugin.getDecayProgress(), Arc2D.OPEN);
+			90.0, -360.0 * sweepProgress, Arc2D.OPEN);
 
 		g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g.setStroke(ARC_STROKE);
-		g.setColor(OverhealSaveColors.arcColor(plugin.isWarningActive()));
+		g.setColor(OverhealSaveColors.arcColor(flashing));
 		g.draw(arc);
 		return null;
 	}
